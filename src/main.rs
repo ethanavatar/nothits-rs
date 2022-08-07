@@ -1,3 +1,4 @@
+use std::io::ErrorKind;
 use std::path::PathBuf;
 use std::fs::read_to_string;
 use clap::Parser;
@@ -14,15 +15,33 @@ struct Args {
    input: PathBuf,
 }
 
+fn open_error(err: ErrorKind, filename: PathBuf) -> ! {
+    let msg: String = match err {
+        ErrorKind::NotFound =>         format!("File not found: {:?}", filename),
+        ErrorKind::PermissionDenied => format!("Permission denied: {:?}", filename),
+        ErrorKind::AlreadyExists
+        | ErrorKind::InvalidInput =>   unreachable!("Program doesn't create/modify files"),
+        _ => format!("Unhandled ErrorKind: {:?}", err),
+    };
+    panic!("{}", msg);
+}
+
 fn main() {
     let args = Args::parse();
 
     println!("{:?}", args);
 
-    let values_raw: String = read_to_string(args.values).unwrap();
+    let values_raw: String  = match read_to_string(&args.values) {
+        Ok(s) => s,
+        Err(e) => open_error(e.kind(), args.values.clone()),
+    };
+
     let values: Vec<&str> = values_raw.split("\n").collect();
     
-    let input = read_to_string(&args.input).unwrap();
+    let input = match read_to_string(&args.input) {
+        Ok(input) => input,
+        Err(e) => open_error(e.kind(), args.input.clone()),
+    };
 
     let mut missing: Vec<&str> = Vec::new();
     for value in values {
