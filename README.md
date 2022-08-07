@@ -6,7 +6,7 @@ A command line tool to find which strings don't exist in an input file
 
 ```bash
 $ ./nohits.exe --help
-Takes a file (values) that contains a list of strings and outputs a list of which string dont
+Takes a file (values) that contains a list of strings and outputs a list of which strings do not
 appear in the input file (input)
 
 USAGE:
@@ -42,4 +42,12 @@ output
 ```bash
 $ nohits --values query.txt --input dogs.txt
 James Bond
+```
+
+## Building from source
+
+using [Cargo](https://crates.io/):
+
+```bash
+cargo build --release
 ```

@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use std::fs::read_to_string;
 use clap::Parser;
 
-/// Takes a file (values) that contains a list of strings and outputs a list of which string didn't appear in the input file (input).
+/// Takes a file (values) that contains a list of strings and outputs a list of which strings do not appear in the input file (input)
 #[derive(Parser, Debug)]
 struct Args {
    /// The path to the file containing the values to search for. (cases separated by newlines)
@@ -29,9 +29,7 @@ fn open_error(err: ErrorKind, filename: PathBuf) -> ! {
 fn main() {
     let args = Args::parse();
 
-    println!("{:?}", args);
-
-    let values_raw: String  = match read_to_string(&args.values) {
+    let values_raw: String = match read_to_string(&args.values) {
         Ok(s) => s,
         Err(e) => open_error(e.kind(), args.values.clone()),
     };
