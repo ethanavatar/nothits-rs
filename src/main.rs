@@ -3,6 +3,8 @@ use std::path::PathBuf;
 use std::fs::read_to_string;
 use clap::Parser;
 
+use regex::Regex;
+
 /// Takes a file (values) that contains a list of strings and outputs a list of which strings do not appear in the input file (input)
 #[derive(Parser, Debug)]
 struct Args {
@@ -29,14 +31,14 @@ fn open_error(err: ErrorKind, filename: PathBuf) -> ! {
 fn main() {
     let args = Args::parse();
 
-    let values_raw: String = match read_to_string(&args.values) {
+    let values_raw: String = match read_to_string(&args.values.as_path()) {
         Ok(s) => s,
         Err(e) => open_error(e.kind(), args.values.clone()),
     };
-
-    let values: Vec<&str> = values_raw.split("\n").collect();
+    let values_lf: String = values_raw.replace("\r", "");
+    let values: Vec<&str> = values_lf.split("\n").collect();
     
-    let input = match read_to_string(&args.input) {
+    let input: String = match read_to_string(&args.input.as_path()) {
         Ok(input) => input,
         Err(e) => open_error(e.kind(), args.input.clone()),
     };
@@ -47,5 +49,6 @@ fn main() {
             missing.push(value);
         }
     }
+    
     println!("{}", missing.join("\n"));
 }
